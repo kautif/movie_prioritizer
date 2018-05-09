@@ -25,9 +25,9 @@ app.get('/', function(req, res){
 	res.send('hello');
 });
 
-app.get('/pages/dashboard', MovieController.getMovies);
+app.get('/movies', MovieController.getMovies);
 
-app.post('/pages/dashboard', MovieController.addMovie);
+app.post('/movies', MovieController.addMovie);
 
 app.delete('/movies/:title', MovieController.deleteMovie);
 
