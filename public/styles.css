@@ -1,0 +1,29 @@
+.movie-container {
+	display: flex;
+	justify-content: space-around;
+	flex-wrap: wrap;
+	width: 90%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.add-movie {
+	width: 25%;
+}
+
+table {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.theaders {
+	width: 1300px;
+	display: flex;
+	justify-content: space-around;
+}
+
+#moviesInfo tbody tr {
+	width: 1300px;
+	display: flex;
+	justify-content: space-around;
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hello Dashboard</title>
+	<link rel="stylesheet" type="text/css" href="../styles.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+	<body>
+		<h1>Hello Dashboard</h1>
+		
+		<label name="movies">Movies</label>
+			<form id="search-field" onsubmit="return movieSearch()">
+				<input id="search" type="search">
+				<button type="submit">SEARCH</button>
+			</form><br>
+
+		<div class="movie-container">
+			
+		</div>
+
+		<table id="moviesInfo">
+			<thead>
+				<tr class="theaders">
+					<th class="col-title">Movie</th>
+					<th class="col-title">Release Date</th>
+					<th class="col-title">Earnings</th>
+					<th class="col-title">Rating</th>
+					<th class="col-title">Link</th>
+					<th class="col-title">Order</th>
+					<th class="col-title delete-item">Delete</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	<script type="text/javascript" src="../js/search.js"></script>
+	</body>
+</html>
