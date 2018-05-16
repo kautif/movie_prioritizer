@@ -44,6 +44,7 @@ app.use('/profile', profileRoutes);
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
+app.use(bodyParser.json());
 
 app.use(bodyParser.json());
 
@@ -81,7 +82,6 @@ app.put('/profile/movies', urlencodedParser, (req, res) => {
 		});
 	});
 });
-
 
 app.delete('/profile/mylist/:item', urlencodedParser, (req, res) => {
 		User.find({item: req.params.item}, function(err, data){
