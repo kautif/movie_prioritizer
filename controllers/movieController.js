@@ -1,8 +1,8 @@
-const Movie = require('../models/movie');
+const User = require('../models/user');
 
 module.exports = {
 	getMovies(request, response) {
-		Movie.find({}, function (err, data) {
+		User.find({}, function (err, data) {
 			if (err) throw err;
 			response.send({ movies: data });
 		});
@@ -14,9 +14,10 @@ module.exports = {
 			.catch((error) => console.log(error));
 	},
 	deleteMovie(request, response) {
-		Movie.find({ title: request.params.title })
+		// findById?
+		User.find({ movies: request.params })
 			.remove()
-			.then((movie) => response.json(movie))
+			.then((movie) => response.json({movies: movie}))
 			.catch((error) => console.log(error));
 	}
 };
