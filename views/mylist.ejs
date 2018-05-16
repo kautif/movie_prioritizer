@@ -8,14 +8,27 @@
 	<body>
 		<h1>My Movies</h1>
 		<table>
-			<tr class="theaders">
-				<th class="col-title">Movie</th>
-				<th class="col-title">Release Date</th>
-				<th class="col-title">Rating</th>
-				<th class="col-title">Order</th>
-				<th class="col-title delete-item">Delete</th>	
-			</tr>
+				<tr>
+					<th >Movie</th>
+					<th >Release Date</th>
+					<th >Rating</th>
+					<th >Order</th>
+					<th>Delete</th>	
+				</tr>
+				<% for (let i = 0; i < movies.length; i++) { %>
+					 <tr>  
+						<td class="movie-title"> <%= movies[i].title %> </td>
+						<td> <%= movies[i].release %> </td>
+						<td> <%= movies[i].rating %> </td>
+						<td> dummy </td>
+						<td> <a class="delete" href="">X</a>  </td>
+					 </tr>
+				<% } %>
 		</table>
+
+
+
+		<!-- <%= JSON.stringify(movies[0].title) %> -->
 	<script type="text/javascript" src="../js/search.js"></script>
 	</body>
 </html>

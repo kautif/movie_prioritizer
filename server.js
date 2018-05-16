@@ -51,28 +51,43 @@ app.get('/', function(req, res){
 	res.render('home');
 });
 
-app.get('/mylist', function(req, res){
-
-});
-
-app.put('/profile/movies', urlencodedParser, (req, res) => {
-	// console.log(req);
-	User.findById(req.user._id, (err, data) => {
+app.get('/profile/mylist', urlencodedParser, function(req, res){
+	User.findById(req.user._id, (err, user) => {
 		if (err) {
 			res.status(400).json(err);
 		}
-		const {movies} = data;
-		movies.push(req.body.movieTitle);
-		data.movies = movies;
-		data.save(() => {
-			res.json();
+		// const mongoList = user;
+		console.log(user.movies);
+		res.render('mylist', {
+			movies: user.movies,
+			user: user
 		});
 	});
+});
 
-	// let newMovie = User(req.body).save(function(err, data){
-	// 	if(err) throw err;
-	// 	res.json(data);
-	// });
+app.put('/profile/movies', urlencodedParser, (req, res) => {
+	console.log(req.body);
+	User.findById(req.user._id, (err, user) => {
+		if (err) {
+			res.status(400).json(err);
+		}
+		// const {movies} = data;
+		user.movies.push(req.body);
+		// data.movies = req.body.movieList;
+		// data.movies = movies;
+		user.save((err, d) => {
+			res.json();
+			console.log(d);
+		});
+	});
+});
+
+
+app.delete('/profile/mylist/:item', urlencodedParser, (req, res) => {
+		User.find({item: req.params.item}, function(err, data){
+			if (err) throw err;
+			console.log(req.params.item);
+		});
 });
 
 app.listen(process.env.PORT || 8080);

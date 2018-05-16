@@ -14,19 +14,19 @@ function getMovieData(data){
 		let movieID = parseInt($(this).attr('id'));
 		console.log(movieID);
 		const movieTitle = this.children[0].innerText;
-		const ratingScore = `${data.results[movieID].vote_average * 10}%`;
+		const ratingScore = `${data.results[movieID].vote_average * 10}`;
 		const releaseDate = `${data.results[movieID].release_date}`;
 		const movieObj = {
 			title: movieTitle,
 			rating: ratingScore,
 			release: releaseDate
 		};
-		movieList.push(movieObj);
+		// movieList.push(movieObj);
 		console.log(movieList);
 		
 		$.ajax({
 			method: 'put',
-			data: {movieList},
+			data: movieObj,
 			url: '/profile/movies'
 		});
 	});
@@ -54,7 +54,7 @@ function handleSearch(data){
 
 	for (let i = 0; i < data.results.length; i++) {
 		$('.movie-container')
-		.append(`<form method="post" action="/pages/dashboard" class="add-movie" id="${i}">
+		.append(`<form method="post" class="add-movie" id="${i}">
 			<p class="movie-results">${data.results[i].title}</p>
 			<img src="https://image.tmdb.org/t/p/w200_and_h300_bestv2${data.results[i].poster_path}">
 			<button type="submit">Add to List</button>
@@ -83,6 +83,19 @@ function handleSearch(data){
 			});
 		});
 
+}
+
+function deleteMovie(){
+	$('.delete').click(function(){
+		let item = $(this).parent().parent();
+		$.ajax({
+			method: 'DELETE',
+			url: '/profile/mylist/' + item,
+			success: function(data){
+				location.reload(data);
+			}
+		});
+	});
 }
 
 // module.exports = {movieList};
