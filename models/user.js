@@ -5,7 +5,8 @@ const Schema = mongoose.Schema;
 const MovieSchema = new Schema({
 	title: String,
 	rating: Number,
-	release: String
+	release: String,
+	position: Number
 });
 
 const UserSchema = new Schema({

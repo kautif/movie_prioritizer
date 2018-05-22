@@ -4,31 +4,43 @@
 	<title>Hello Dashboard</title>
 	<link rel="stylesheet" type="text/css" href="../styles.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script
+  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+  crossorigin="anonymous"></script>
 </head>
 	<body>
 		<h1>My Movies</h1>
-		<table>
+		<table id="sort">
 				<tr>
-					<th >Movie</th>
-					<th >Release Date</th>
-					<th >Rating</th>
-					<th >Order</th>
-					<th>Delete</th>	
+					<th class="index">Number</th>
+					<th class="index">Movie</th>
+					<th class="index">Release Date</th>
+					<th class="index">Rating</th>
+					<th class="index">Delete</th>	
 				</tr>
-				<% for (let i = 0; i < movies.length; i++) { %>
-					 <tr>  
-						<td class="movie-title"> <%= movies[i].title %> </td>
-						<td> <%= movies[i].release %> </td>
-						<td> <%= movies[i].rating %> </td>
-						<td> dummy </td>
-						<td> <a class="delete" href="">X</a>  </td>
-					 </tr>
-				<% } %>
+
+				<tbody>
+					<% for (let i = 0; i < movies.length; i++) { %>
+							 
+							 <tr id="<%= movies[i]._id %>">  
+								<td class="index index-num"><%= i + 1 %></td>
+								<td class="movie-title"> <%= movies[i].title %> </td>
+								<td> <%= movies[i].release %> </td>
+								<td> <%= movies[i].rating %> </td>
+								<td> <a class="delete" data-id="<%= movies[i]._id %>" href="">X</a>  </td>
+
+							 </tr>
+
+						<% } %>
+
+				</tbody>
+
+
 		</table>
 
 
-
-		<!-- <%= JSON.stringify(movies[0].title) %> -->
 	<script type="text/javascript" src="../js/search.js"></script>
+	<script type="text/javascript" src="../js/drag.js"></script>
 	</body>
 </html>

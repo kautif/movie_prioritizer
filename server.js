@@ -44,7 +44,6 @@ app.use('/profile', profileRoutes);
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
-app.use(bodyParser.json());
 
 app.use(bodyParser.json());
 
@@ -53,21 +52,32 @@ app.get('/', function(req, res){
 });
 
 app.get('/profile/mylist', urlencodedParser, function(req, res){
+
 	User.findById(req.user._id, (err, user) => {
+	
 		if (err) {
 			res.status(400).json(err);
 		}
+	
 		// const mongoList = user;
-		console.log(user.movies);
 		res.render('mylist', {
-			movies: user.movies,
+			
+			movies: user.movies.sort((a, b) => {
+
+				return a.position - b.position;
+
+			}),
+			
 			user: user
+
 		});
 	});
 });
 
+// Add a movie to list
+
 app.put('/profile/movies', urlencodedParser, (req, res) => {
-	console.log(req.body);
+	// console.log(req.body);
 	User.findById(req.user._id, (err, user) => {
 		if (err) {
 			res.status(400).json(err);
@@ -83,10 +93,64 @@ app.put('/profile/movies', urlencodedParser, (req, res) => {
 	});
 });
 
+app.put('/profile/mylist', urlencodedParser, (req, res) => {
+
+	User.findById('5afc82b53bd401193485fa27', (err, user) => {
+
+		//
+		// First, loop through each movie for the
+		// current user.
+		//
+		for(let j = 0; j < user.movies.length; j++) {
+
+			let newPosition = 0;
+
+			//
+			// Loop through positions array sent from the frontend
+			// to find the index that matches the movie._id
+			//
+			for(let position = 0; position < req.body.positions.length; position++) {
+
+				if(user.movies[j]._id == req.body.positions[position]) {
+
+					newPosition = position;
+
+					break;
+
+				}
+
+			}
+
+			user.movies[j].position = newPosition;
+
+		}
+
+		user.save();
+
+	});
+
+
+	res.status(201).send('done');
+
+
+})
+
+// Update order
+
+app.put('/profile/mylist/:item', urlencodedParser, (req, res) => {
+	// User.findOneAndUpdate()
+});
+
+
+// Delete a movie from your list
+
 app.delete('/profile/mylist/:item', urlencodedParser, (req, res) => {
-		User.find({item: req.params.item}, function(err, data){
+		// First authenticate user prior to deletion. Only user should be able to delete own movies. 
+		User.findOneAndUpdate({"movies._id": req.params.item}, {$pull:{movies: {_id:req.params.item } }}, function(err, user){
+			
 			if (err) throw err;
-			console.log(req.params.item);
+			// Send response of deleted item and updated movie list.
+			res.json(user);
 		});
 });
 

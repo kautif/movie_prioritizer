@@ -8,22 +8,21 @@ $('#search-field').on('submit', function(e){
 // Call function inside handleSearch. 
 // Give function data argument in order to access API data
 
-function getMovieData(data){
+function updateMovie(){
 	$(document).on('submit', '.add-movie', function(e){
 		e.preventDefault();
 		let movieID = parseInt($(this).attr('id'));
 		console.log(movieID);
 		const movieTitle = this.children[0].innerText;
-		const ratingScore = `${data.results[movieID].vote_average * 10}`;
-		const releaseDate = `${data.results[movieID].release_date}`;
-		const movieObj = {
+		const ratingScore = `${movieResults.results[movieID].vote_average * 10}`;
+		const releaseDate = `${movieResults.results[movieID].release_date}`;
+		let movieObj = {
 			title: movieTitle,
 			rating: ratingScore,
 			release: releaseDate
 		};
-		// movieList.push(movieObj);
-		console.log(movieList);
-		
+
+		console.log(movieObj);
 		$.ajax({
 			method: 'put',
 			data: movieObj,
@@ -31,6 +30,10 @@ function getMovieData(data){
 		});
 	});
 }
+
+updateMovie();
+
+let movieResults;
 
 function movieSearch(){
 	let queryStr = $('#search').val();
@@ -41,8 +44,9 @@ function movieSearch(){
 				query: queryStr
 			},
 				function getRequest(data){
+					movieResults = data;
 					handleSearch(data);
-					getMovieData(data);
+					// removeBrokenImg(data);
 				}
 			)
 };
@@ -53,12 +57,29 @@ function handleSearch(data){
 // List of results
 
 	for (let i = 0; i < data.results.length; i++) {
+		let resultName = data.results[i].title;
+		if (data.results[i].title.length > 15) {
+				resultName = data.results[i].title.substring(0, 15) + '...';
+		}
+		
+		let imgPath = `https://image.tmdb.org/t/p/w200_and_h300_bestv2${data.results[i].poster_path}`;
+		let imgUnavailable = `https://lh6.googleusercontent.com/5vaCOketHTH0FcofsR8-W1XQ3r85fl5mj_lp4ghKgunKnAHBob0yqSKhNwD2wGPMwyy959RKe_cqCkpFySk_=w1366-h613`;
+		let finalImgPath;
+
+		if (imgPath === `https://image.tmdb.org/t/p/w200_and_h300_bestv2null`) {
+			finalImgPath = imgUnavailable;
+		} else {
+			finalImgPath = imgPath;
+		}
+
 		$('.movie-container')
-		.append(`<form method="post" class="add-movie" id="${i}">
-			<p class="movie-results">${data.results[i].title}</p>
-			<img src="https://image.tmdb.org/t/p/w200_and_h300_bestv2${data.results[i].poster_path}">
-			<button type="submit">Add to List</button>
+		.append(`<form method="post" class="add-movie" id="${i}"> 
+			<p class="movie-results">${resultName}</p> 
+			<img src="${finalImgPath}"> 
+			<button type="submit">Add to List</button> 
 			</form>`);
+		
+
 	}
 
 	// Lightbox
@@ -85,17 +106,16 @@ function handleSearch(data){
 
 }
 
-function deleteMovie(){
-	$('.delete').click(function(){
-		let item = $(this).parent().parent();
-		$.ajax({
-			method: 'DELETE',
-			url: '/profile/mylist/' + item,
-			success: function(data){
-				location.reload(data);
-			}
-		});
+$('.delete').click(function(e){
+	e.preventDefault();
+	let item = $(this).attr('data-id');
+	$.ajax({
+		method: 'DELETE',
+		url: '/profile/mylist/' + item,
+		success: function(data){
+			location.reload(data);
+			// console.log(data);
+		}
 	});
-}
-
-// module.exports = {movieList};
+});
+// module.exports = {movieList}; 
