@@ -63,7 +63,7 @@ function handleSearch(data){
 		}
 		
 		let imgPath = `https://image.tmdb.org/t/p/w200_and_h300_bestv2${data.results[i].poster_path}`;
-		let imgUnavailable = `https://lh6.googleusercontent.com/5vaCOketHTH0FcofsR8-W1XQ3r85fl5mj_lp4ghKgunKnAHBob0yqSKhNwD2wGPMwyy959RKe_cqCkpFySk_=w1366-h613`;
+		let imgUnavailable = `https://lh5.googleusercontent.com/P4VjTC8EWiEiBBmhd9cSAwpVlOKS7ZEGhqBiwilh1OusZ5OIxNVlH8egH1lrXtiSySQBgxO-zTFmSf2sSC-L=w1366-h662`;
 		let finalImgPath;
 
 		if (imgPath === `https://image.tmdb.org/t/p/w200_and_h300_bestv2null`) {

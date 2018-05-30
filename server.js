@@ -10,11 +10,9 @@ const passportSetup = require('./login/passport-setup');
 const keys = require('./login/keys');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
-
-const User = require('./models/user');
 // const search = require('./public/js/search');
 
-
+const User = require('./models/user');
 const MovieController = require('./controllers/movieController');
 
 mongoose.Promise = global.Promise;
@@ -34,9 +32,9 @@ app.use(passport.session());
 
 const { PORT, DATABASE_URL } = require('./config');
 
-mongoose.connect(keys.mongodb.URI)
-        .then(() => console.log('Connected to database'))
-        .catch(() => console.log('Failed to connect to database'));
+// mongoose.connect(keys.mongodb.URI)
+//         .then(() => console.log('Connected to database'))
+//         .catch(() => console.log('Failed to connect to database'));
 
 app.use('/auth', authRoutes);
 app.use('/profile', profileRoutes);
@@ -47,42 +45,51 @@ app.use(bodyParser.urlencoded({
 
 app.use(bodyParser.json());
 
-app.get('/', function(req, res){
-	res.render('home');
-});
+// if (process.env.TEST === 'test') {
+// 	mongoose.connect('mongodb://localhost/test-movie-prioritizer', 
+// 		{useMongoClient: true});
+// }
+let server; 
 
-app.get('/profile/mylist', urlencodedParser, function(req, res){
+function runServer(databaseUrl, port = PORT) {
+  return new Promise((resolve, reject) => {
+    mongoose.connect(databaseUrl, err => {
+      if (err) {
+        return reject(err);
+      }
+      server = app.listen(port, () => {
+        resolve();
+      })
+        .on('error', err => {
+          mongoose.disconnect();
+          reject(err);
+        });
+    });
+  });
+}
 
-	User.findById(req.user._id, (err, user) => {
-	
-		if (err) {
-			res.status(400).json(err);
-		}
-	
-		// const mongoList = user;
-		res.render('mylist', {
-			
-			movies: user.movies.sort((a, b) => {
-
-				return a.position - b.position;
-
-			}),
-			
-			user: user
-
-		});
-	});
-});
+function closeServer() {
+  return mongoose.disconnect().then(() => {
+    return new Promise((resolve, reject) => {
+      server.close(err => {
+        if (err) {
+          return reject(err);
+        }
+        resolve();
+      });
+    });
+  });
+}
 
 // Add a movie to list
-
 app.put('/profile/movies', urlencodedParser, (req, res) => {
-	// console.log(req.body);
-	User.findById(req.user._id, (err, user) => {
+	// If not signed in, redirect to login. Create function for multiple places. 
+	User.findById((req.body.user._id) ? req.body.user._id : req.user._id, (err, user) => {
 		if (err) {
 			res.status(400).json(err);
 		}
 		// const {movies} = data;
+		console.log('id in PUT', req.body.user._id)
 		user.movies.push(req.body);
 		// data.movies = req.body.movieList;
 		// data.movies = movies;
@@ -95,7 +102,7 @@ app.put('/profile/movies', urlencodedParser, (req, res) => {
 
 app.put('/profile/mylist', urlencodedParser, (req, res) => {
 
-	User.findById('5afc82b53bd401193485fa27', (err, user) => {
+	User.findById(req.user._id, (err, user) => {
 
 		//
 		// First, loop through each movie for the
@@ -109,38 +116,47 @@ app.put('/profile/mylist', urlencodedParser, (req, res) => {
 			// Loop through positions array sent from the frontend
 			// to find the index that matches the movie._id
 			//
-			for(let position = 0; position < req.body.positions.length; position++) {
-
-				if(user.movies[j]._id == req.body.positions[position]) {
-
+			for(let position = 1; position < req.body.positions.length; position++) {
+				if( req.body.positions[position] == user.movies[j]._id) {
 					newPosition = position;
-
 					break;
-
 				}
-
 			}
-
 			user.movies[j].position = newPosition;
-
 		}
 
 		user.save();
 
+	res.status(201).send('done');
 	});
 
 
-	res.status(201).send('done');
 
 
 })
-
-// Update order
-
-app.put('/profile/mylist/:item', urlencodedParser, (req, res) => {
-	// User.findOneAndUpdate()
+// process.env.TEST_DATABASE_URL ? '5b05eb04f66010215024ac29' : req.user._id
+app.get('/profile/mylist', urlencodedParser, function(req, res){
+		User.findById('5b0a0d22bdc5fd230c2d01f4', (err, user) => {
+		console.log('USER ID', user);
+		if (err) {
+			res.status(400).json(err);
+		}
+		// res.send({	
+		// 	movies: user.movies.sort((a, b) => {
+		// 		return a.position - b.position;
+		// 	}),			
+		// 	user: user
+		// });
+	
+		res.render('mylist', {
+			movies: user.movies.sort((a, b) => {
+				console.log(res);
+				return a.position - b.position;
+			}),
+			user: user
+		});
+	});
 });
-
 
 // Delete a movie from your list
 
@@ -154,6 +170,12 @@ app.delete('/profile/mylist/:item', urlencodedParser, (req, res) => {
 		});
 });
 
-app.listen(process.env.PORT || 8080);
+app.get('/', function(req, res){
+	res.render('home');
+});
 
-module.exports = app;
+if (require.main === module) {
+  runServer(DATABASE_URL).catch(err => console.error(err));
+}
+
+module.exports = {app, runServer, closeServer};

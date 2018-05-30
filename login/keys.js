@@ -8,5 +8,12 @@ module.exports = {
 	},
 	session: {
 		cookieKey: 'cisforcookieandthatsgoodenoughforme'
-	}
+	},
+	fakeGoogle:{
+		clientId: 'abc',
+		clientSecret: '123'
+		
+	} 
 }
+
+// Store .
