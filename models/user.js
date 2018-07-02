@@ -10,8 +10,23 @@ const MovieSchema = new Schema({
 });
 
 const UserSchema = new Schema({
-	username: String,
-	googleID: String,
+	username: {
+		type: String,
+		required: true,
+		unique: true
+	},
+	password: {
+		type: String,
+		required: true
+	},
+	firstName: {
+		type: String,
+		default: ''
+	},
+	lastName: {
+		type: String,
+		default: ''
+	},
 	movies: [MovieSchema]
 });
 

@@ -1,6 +1,16 @@
 const router = require('express').Router();
 const passport = require('passport');
+const User = require('../models/user');
+
 // auth-login
+
+router.post('/signup', passport.authenticate('local-signup', { successRedirect: '/',
+                                   failureRedirect: '/auth/login',
+                                   failureFlash: false }));
+
+router.post('/login', passport.authenticate('local-login', { successRedirect: '/',
+                                   failureRedirect: '/auth/login',
+                                   failureFlash: false }));
 
 router.get('/login', (req, res) =>{
 
@@ -9,19 +19,9 @@ router.get('/login', (req, res) =>{
 	res.render('login');
 });
 
-router.get('/logout', (req, res) => {
-	// handle with passport
-		res.send('logging out');
-});
-
-// auth with google
-
-router.get('/google', passport.authenticate('google', {
-	scope: ['profile']
-}));
-
-router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
-	res.redirect('/profile/');
+router.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
 });
 
 module.exports = router;

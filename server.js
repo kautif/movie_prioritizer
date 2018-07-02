@@ -27,6 +27,11 @@ app.use(cookieSession({
 	keys: ['keys.session.cookieKey']
 }));
 
+app.use(bodyParser.urlencoded({
+	extended: true
+}));
+
+app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -39,11 +44,6 @@ const { PORT, DATABASE_URL } = require('./config');
 app.use('/auth', authRoutes);
 app.use('/profile', profileRoutes);
 
-app.use(bodyParser.urlencoded({
-	extended: true
-}));
-
-app.use(bodyParser.json());
 
 // if (process.env.TEST === 'test') {
 // 	mongoose.connect('mongodb://localhost/test-movie-prioritizer', 
@@ -51,15 +51,17 @@ app.use(bodyParser.json());
 // }
 let server; 
 
-function runServer(databaseUrl, port = PORT) {
+function runServer() {
   return new Promise((resolve, reject) => {
-    mongoose.connect(databaseUrl, err => {
+    mongoose.connect(DATABASE_URL, err => {
       if (err) {
         return reject(err);
       }
-      server = app.listen(port, () => {
-        resolve();
-      })
+      server = app
+        .listen(PORT, () => {
+          console.log(`Your app is listening on port ${PORT}`);
+          resolve();
+        })
         .on('error', err => {
           mongoose.disconnect();
           reject(err);
@@ -84,12 +86,12 @@ function closeServer() {
 // Add a movie to list
 app.put('/profile/movies', urlencodedParser, (req, res) => {
 	// If not signed in, redirect to login. Create function for multiple places. 
-	User.findById((req.body.user._id) ? req.body.user._id : req.user._id, (err, user) => {
+	User.findById((req.user._id), (err, user) => {
 		if (err) {
 			res.status(400).json(err);
 		}
 		// const {movies} = data;
-		console.log('id in PUT', req.body.user._id)
+		console.log('id in PUT', req.user._id)
 		user.movies.push(req.body);
 		// data.movies = req.body.movieList;
 		// data.movies = movies;
@@ -136,8 +138,9 @@ app.put('/profile/mylist', urlencodedParser, (req, res) => {
 })
 // process.env.TEST_DATABASE_URL ? '5b05eb04f66010215024ac29' : req.user._id
 app.get('/profile/mylist', urlencodedParser, function(req, res){
-		User.findById('5b0a0d22bdc5fd230c2d01f4', (err, user) => {
-		console.log('USER ID', user);
+		User.findById(req.user._id, (err, user) => {
+		console.log('req', req);
+		console.log('req.user: ', req.user);
 		if (err) {
 			res.status(400).json(err);
 		}
