@@ -7,7 +7,7 @@ const authRoutes = require('./routes/auth-routes.js');
 const profileRoutes = require('./routes/profile-routes.js');
 
 const passportSetup = require('./login/passport-setup');
-const keys = require('./login/keys');
+// const keys = require('./login/keys');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
 // const search = require('./public/js/search');
@@ -87,25 +87,26 @@ function closeServer() {
 app.put('/profile/movies', urlencodedParser, (req, res) => {
 	// If not signed in, redirect to login. Create function for multiple places. 
 	User.findById((req.user._id), (err, user) => {
+		// console.log('server.js req.body Line 90: ', req.body.title)
+		if(User.find({"title": req.body.title, "rating": req.body.rating, "release": req.body.release})) {
+			return
+		} else {
+			user.movies.push(req.body);
+			user.save((err, d) => {
+				res.json();
+				// console.log(d);
+			});
+		}
 		if (err) {
 			res.status(400).json(err);
 		}
-		// const {movies} = data;
-		console.log('id in PUT', req.user._id)
-		user.movies.push(req.body);
-		// data.movies = req.body.movieList;
-		// data.movies = movies;
-		user.save((err, d) => {
-			res.json();
-			console.log(d);
-		});
 	});
 });
 
 app.put('/profile/mylist', urlencodedParser, (req, res) => {
 
 	User.findById(req.user._id, (err, user) => {
-
+		// User.find({req.user.movies.title, req.user.movies.rating, req.user.movies.release})
 		//
 		// First, loop through each movie for the
 		// current user.
@@ -139,8 +140,8 @@ app.put('/profile/mylist', urlencodedParser, (req, res) => {
 // process.env.TEST_DATABASE_URL ? '5b05eb04f66010215024ac29' : req.user._id
 app.get('/profile/mylist', urlencodedParser, function(req, res){
 		User.findById(req.user._id, (err, user) => {
-		console.log('req', req);
-		console.log('req.user: ', req.user);
+		// console.log('req', req);
+		// console.log('req.user: ', req.user);
 		if (err) {
 			res.status(400).json(err);
 		}
@@ -153,7 +154,7 @@ app.get('/profile/mylist', urlencodedParser, function(req, res){
 	
 		res.render('mylist', {
 			movies: user.movies.sort((a, b) => {
-				console.log(res);
+				// console.log(res);
 				return a.position - b.position;
 			}),
 			user: user
@@ -164,12 +165,15 @@ app.get('/profile/mylist', urlencodedParser, function(req, res){
 // Delete a movie from your list
 
 app.delete('/profile/mylist/:item', urlencodedParser, (req, res) => {
+		// console.log('hi');
 		// First authenticate user prior to deletion. Only user should be able to delete own movies. 
 		User.findOneAndUpdate({"movies._id": req.params.item}, {$pull:{movies: {_id:req.params.item } }}, function(err, user){
 			
 			if (err) throw err;
 			// Send response of deleted item and updated movie list.
-			res.json(user);
+			// console.log('Line 172: ', user);
+			res.status(204)
+			.end();
 		});
 });
 
