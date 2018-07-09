@@ -1,5 +1,5 @@
 const passport = require('passport');
-// Add bcrypt
+const bcrypt = require('bcrypt');
 const LocalStrategy = require('passport-local').Strategy;
 // const GoogleStrategy = require('passport-google-oauth20');
 const keys = require('./keys');
@@ -18,13 +18,45 @@ passport.deserializeUser((id, done) => {
 	});
 }); 
 
+const saltRounds = 10;
+
+function validPassword(password){
+    if(!password) {
+        return false;
+    }
+
+    if (password.length < 8){
+        return false;
+    }
+
+    return password.match(/^[A-Za-z0-9]*$/) !== null;
+}
+
+function validUsername(username){
+    if (!username) {
+        return false;
+    }
+
+    if (username.length < 5) {
+        return false;
+    }
+
+    return username.match(/^[A-Za-z0-9]*$/) !== null
+}
+
 passport.use('local-signup', new LocalStrategy(
     function(username, password, done) {
     	console.log('username: ', username);
     	console.log('password: ', password);
         // asynchronous
         // User.findOne wont fire unless data is sent back
+        if(!validUsername(username)) {
+            return done(null, false, {message: 'That username is not valid. Must be at least 5 characters. Can contain only letters or numbers.'})
+        }
 
+        if(!validPassword(password)) {
+            return done(null, false, { message: 'That password is not valid. Must be at least 8 characters. Can contain only letters or numbers.'})
+        }
         // find a user whose email is the same as the forms email
         // we are checking to see if the user trying to login already exists
         User.findOne({ username :  username }, function(err, user) {
@@ -37,20 +69,30 @@ passport.use('local-signup', new LocalStrategy(
                 return done(null, false, { message: 'That email is already taken.'});
             } else {
 
-                // if there is no user with that email
-                // create the user
-                var newUser = new User();
-
-                // set the user's local credentials
-                newUser.username = username;
-                newUser.password = password;
-
-                // save the user
-                newUser.save(function(err) {
+                bcrypt.hash(password, saltRounds, function(err, hash) {
+                  // Store hash in your password DB.
+                    // if there is no user with that email
+                    // create the user
                     if (err)
-                        throw err;
-                    return done(null, newUser);
+                        return done(err);
+
+                    var newUser = new User();
+
+                    // set the user's local credentials
+                    newUser.username = username;
+
+                    // password supposed to be hash, but if hash is longer than password length requirement 
+                    // and has more than alphanumeric chars, password will be rejected.
+                    newUser.password = hash;
+
+                    // save the user
+                    newUser.save(function(err) {
+                        if (err)
+                            throw err;
+                        return done(null, newUser);
+                    });
                 });
+                
             }
 
         });    
@@ -70,13 +112,18 @@ passport.use('local-login', new LocalStrategy(
             // if no user is found, return the message
             if (!user)
                 return done(null, false, { message:  'No user found.'}); // req.flash is the way to set flashdata using connect-flash
+            bcrypt.compare(password, user.password, function(err, res) {
+                if (err) 
+                    return done(err);
 
-            // if the user is found but the password is wrong
-            if (user.password !== password)
+                if (res) 
+                    return done(null, user);
+
                 return done(null, false, { message:  'Incorrect password.'}); // create the loginMessage and save it to session as flashdata
 
-            // all is well, return successful user
-            return done(null, user);
+                 
+            });
+
         });
 
     }));

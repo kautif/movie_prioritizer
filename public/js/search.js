@@ -8,54 +8,90 @@ $('#search-field').on('submit', function(e){
 // Call function inside handleSearch. 
 // Give function data argument in order to access API data
 
+
+let movieResults;
+
+function movieSearch(){
+	let queryStr = $('#search').val();
+		$.when($.get('https://api.themoviedb.org/3/search/movie',
+			{
+				api_key: '08eba60ea81f9e9cf342c7fa3df07bb6',
+				query: queryStr
+			}), $.get('/profile/mylist/json'))
+				.done(function(searchResults, savedResults){
+					console.log('search results: ', searchResults, 'saved results: ', savedResults[0][0].tmdbID);
+						let savedIds = [];
+					for (let i = 0; i < savedResults[0].length; i++) {
+						savedIds.push(savedResults[0][i].tmdbID);
+					}
+
+						movieResults = searchResults[0]; 
+						console.log('Line 58: ', movieResults);
+					console.log('SavedIds: ', savedIds);
+					handleSearch(searchResults[0], savedIds);
+				});
+
+		// $.get(
+		// 	'https://api.themoviedb.org/3/search/movie',
+		// 	{
+		// 		api_key: '08eba60ea81f9e9cf342c7fa3df07bb6',
+		// 		query: queryStr
+		// 	},
+		// 		function getRequest(data){
+		// 			movieResults = data;
+		// 			handleSearch(data);
+		// 			// removeBrokenImg(data);
+		// 		}
+		// 	)
+};
+
 function updateMovie(){
 	$(document).on('submit', '.add-movie', function(e){
 		e.preventDefault();
 		let movieID = parseInt($(this).attr('id'));
-		console.log(movieID);
+		// console.log('Line 51', movieResults.results);
 		const movieTitle = this.children[0].innerText;
-		const ratingScore = `${movieResults.results[movieID].vote_average * 10}`;
-		const releaseDate = `${movieResults.results[movieID].release_date}`;
+		const ratingScore = movieResults.results[movieID].vote_average * 10;
+		const releaseDate = movieResults.results[movieID].release_date;
+		const uniqueID = movieResults.results[movieID].id;
+
+
 		let movieObj = {
 			title: movieTitle,
 			rating: ratingScore,
-			release: releaseDate
+			release: releaseDate,
+			tmdbID: uniqueID 
 		};
+		// console.log(movieObj);
 
-		console.log(movieObj);
 		$.ajax({
 			method: 'put',
 			data: movieObj,
-			url: '/profile/movies'
+			url: '/profile/movies',
+			success: function(result){
+				let queryStr = $('#search').val();
+				// location.reload();
+				$.get('https://api.themoviedb.org/3/search/movie',
+			{
+				api_key: '08eba60ea81f9e9cf342c7fa3df07bb6',
+				query: queryStr
+			})
+				.then((movies)=> {
+					movieSearch();
+				})
+				console.log(queryStr);
+			}
 		});
 	});
 }
 
 updateMovie();
 
-let movieResults;
-
-function movieSearch(){
-	let queryStr = $('#search').val();
-		$.get(
-			'https://api.themoviedb.org/3/search/movie',
-			{
-				api_key: '08eba60ea81f9e9cf342c7fa3df07bb6',
-				query: queryStr
-			},
-				function getRequest(data){
-					movieResults = data;
-					handleSearch(data);
-					// removeBrokenImg(data);
-				}
-			)
-};
-
-function handleSearch(data){
+function handleSearch(data, savedMovieIds){
 		$('.movie-container').html('');
-	
+	$.getJSON('/profile/mylist/json', console.log);
 // List of results
-
+	// console.log(data.results);
 	for (let i = 0; i < data.results.length; i++) {
 		let resultName = data.results[i].title;
 		if (data.results[i].title.length > 15) {
@@ -75,17 +111,15 @@ function handleSearch(data){
 		$('.movie-container')
 		.append(`<form method="post" class="add-movie" id="${i}"> 
 			<p class="movie-results">${resultName}</p> 
-			<img src="${finalImgPath}"> 
-			<button type="submit">Add to List</button> 
+			<img movie-id="${i}" src="${finalImgPath}"> 
+			${savedMovieIds.includes(data.results[i].id) ? '<button disabled>Saved</button>' : '<button type="submit">Add to List</button>'} 
 			</form>`);
-		
-
 	}
 
 	// Lightbox
 
-		$('.add-movie').click(function () {
-			let movieID = parseInt($(this).attr('id'));
+		$('.add-movie img').click(function () {
+			let movieID = parseInt($(this).attr('movie-id'));
 			$('.movie-container').append(`
 				<div class="movie-result">
 				<span class="close">&times;</span>
@@ -119,3 +153,6 @@ $('.delete').click(function(e){
 	});
 });
 // module.exports = {movieList}; 
+
+// Compare tmdbID in JSON of movies array to id in movie search. 
+// If equal, grey out button and make unclickable. If not equal, button should still be enabled. 
