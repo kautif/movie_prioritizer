@@ -2,12 +2,12 @@
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-// const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 
 const { app, runServer, closeServer } = require('../server');
-const { User } = require('../models/user');
-const { JWT_SECRET } = require('../config');
+const User = require('../models/user');
+const { PORT, TEST_DATABASE_URL } = require('../config');
 
 const expect = chai.expect;
 
@@ -16,6 +16,8 @@ const expect = chai.expect;
 // see: https://github.com/chaijs/chai-http
 chai.use(chaiHttp);
 
+// declare authenticatedUser variable
+
 describe('Movie Repository', function () {
   const username = 'exampleUser';
   const password = 'examplePass';
@@ -23,7 +25,7 @@ describe('Movie Repository', function () {
   const lastName = 'User';
 
   before(function () {
-    return runServer();
+    return runServer(TEST_DATABASE_URL);
   });
 
   after(function () {
@@ -31,18 +33,23 @@ describe('Movie Repository', function () {
   });
 
   beforeEach(function() {
-    return User.hashPassword(password).then(password =>
+    return bcrypt.hash(password, 10).then(password =>
       User.create({
         username,
         password,
         firstName,
         lastName
       })
+      // https://codeburst.io/authenticated-testing-with-mocha-and-chai-7277c47020b7: Look at Writing Tests section
+      // .then(() => {
+        // authenticatedUser = request.agent(app)
+        // login authenciatedUser
+      // })
     );
   });
 
   afterEach(function () {
-    return User.remove({});
+    return User.remove({username: 'exampleUser'});
   });
 
   let movieX = {
@@ -70,124 +77,148 @@ describe('Movie Repository', function () {
 
 // Can't get movies to save to database for some reason.
 
-  describe.only('GET profile/mylist', function() {
+  describe('GET profile/mylist', function() {
     it('Should retrieve empty movie array for user', function () {
-      // return User.findOne()
-        // .then(data => {
-        //   expect(data.movies).to.be.empty;
-        // });
-
-      return chai 
-        .request(app)
-        .get('/profile/mylist')
-        .send({username: username, password: password})
-        .then( res => {
-          User.findOne()
-            .then(data => {
-              expect(data.movies).to.be.empty;
-            });           
+      var agent = chai.request.agent(app)
+      return agent
+        .post('/auth/login')
+        .send({ username, password})
+        .then(function (res) {
+          // The `agent` now has the sessionid cookie saved, and will send it
+          // back to the server in the next request:
+          return agent.get('/profile/mylist')
+            .then(function (res) {
+              // res.body is empty.
+               expect(res).to.have.status(200);
+            });
         });
     });
   });
 
   describe('PUT /profile/movies', function () {
     it('Should update movies array to add one movie', function() {
-      // User.findOne()
-      //   .then(data => {
-      //   });
-
-      return chai 
-        .request(app)
-        .put('/profile/movies')
-        .send({username: username, password: password})
+        
+        var agent = chai.request.agent(app)
+      return agent
+        .post('/auth/login')
+        .send({ username, password})
         .then((err, res) => {
           return User.findOne({})
             .then(updatedUser => {
               updatedUser.movies.push(movieX);
               updatedUser.save((err, result) => {
-                // console.log(result);
               });
               expect(updatedUser.movies.length).to.equal(1);
-              // console.log("User after adding movie: ", updatedUser);
             });
         });
+          return agent.get('/profile/movies')
+            .then(function (res) {
+               expect(res).to.have.status(200);
+            });
+        });      
     });
 
     it('Should GET user movies list', function() {
-      return User.findOne({})
-        .then(updatedUser => {
+      
+      var agent = chai.request.agent(app)
+      return agent
+        .post('/auth/login')
+        .send({ username, password})
+        .then((err, res) => {
+          return User.findOne({})
+            .then(updatedUser => {
           updatedUser.movies.push(movieX);
           updatedUser.save((err, result) => {
             // console.log(result);
           });
           // console.log("User after adding movie: ", updatedUser);
+          });
         });
-
-      return chai 
-        .request(app)
-        .get('/profile/mylist')
-        .send({username: username, password: password})
-        .then((err, res) => {
+          return agent.get('/profile/movies')
+            .then((err, res) => {
           return User.findOne({})
             .then(updatedUser => {
               expect(updatedUser.movies.length).to.equal(1);
-              console.log("GET updatedUser: ", updatedUser);
-            });
-        });
-    });
-
-
-    it('Add one more movie, and GET list again', function() {
-      User.findOne({})
-        .then(data => {
-          data.movies.push(movieX);
-          data.save((err,result) => {
-              console.log('line 144: ', result);
-          });
-          expect(data.movies.length).to.equal(1);
-        });
-
-      return chai
-        .request(app)
-        .get('/profile/mylist')
-        .send({username: username, password: password})
-        .then((err, res) => {
-          return User.findOne({})
-            .then(updatedUser => {
-              User.findOne({})
-                .then(data => {
-                  data.movies.push(movieY);
-                  data.save((err,result) => {
-                    console.log('line 149: ', result);
-                  });
-                  expect(data.movies.length).to.equal(2);
-                });
               // console.log("GET updatedUser: ", updatedUser);
             });
         });
     });
-  });
 
-// con't ***
+    // Test that movie has keys that its supposed to
+
+
+    it('Add one more movie, and GET list again', function() {
+      var agent = chai.request.agent(app)
+      return agent
+        .post('/auth/login')
+        .send({ username, password})
+        .then((err, res) => {
+          return User.findOne({})
+        .then(data => {
+          console.log('line 154: ', data)
+          data.movies.push(movieX);
+          data.save((err,result) => {
+              // console.log('line 144: ', result);
+          });
+          expect(data.movies.length).to.equal(1);
+        });
+      });
+        return agent.get('/profile/mylist')
+            .then((err, res) => {
+          return User.findOne({})
+            .then((err, res) => {
+              return User.findOne({})
+                .then(updatedUser => {
+                  User.findOne({})
+                    .then(data => {
+                      data.movies.push(movieY);
+                      data.save((err,result) => {
+                        // console.log('line 161: ', result);
+                      });
+                      expect(data.movies.length).to.equal(2);
+                    });
+                  // console.log("GET updatedUser: ", updatedUser);
+                });
+            });
+        });
+    });
 
   describe('PUT profile/mylist', function() {
     it('Should change movie order of current movies in user list', function () {
-      return User.findOne({})
-          .then((user) => {
-            user.movies.push(movieX, movieY);
-            console.log(user);
-            return user.save();
+      var agent = chai.request.agent(app)
+      return agent
+        .post('/auth/login')
+        .send({ username, password})
+        .then((err, res) => {
+          return User.findOne({})
+        .then(data => {
+          data.movies.push(movieX, movieY);
+          data.save((err,result) => {
+              // console.log('line 144: ', result);
+          });
+          expect(data.movies.length).to.equal(2);
         });
-
-      return chai 
-        .request(app)
-        .put('/profile/mylist')
-        .send({username: username, password: password})
-        .then( res => {
-          User.findOne()
-            .then(data => {
-              console.log('Line 186:', data)
-            });           
+      });
+        return agent.get('/profile/mylist')
+            .then((err, res) => {
+          return User.findOne({})
+            .then((err, res) => {
+              return User.findOne({})
+                .then(updatedUser => {
+                  User.findOne({})
+                    .then(data => {
+                      data.movies.movieY.position = 1;
+                      console.log('Line 211: ', data.movies.movieY);
+                      data.movies.movieX.position = 2;
+                      data.save((err,result) => {
+                          // console.log('line 144: ', result);
+                      });
+                      expect(data.movies.movieY.position).to.equal(1);
+                      expect(data.movies.movieX.position).to.equal(2);
+                    });
+                  // console.log("GET updatedUser: ", updatedUser);
+                });
+            });
         });
     });
   });
@@ -198,68 +229,117 @@ describe('Movie Repository', function () {
 
 let user, movieId;
 
-        return User.findOne({})
-          .then((user) => {
-            // Add and save movieX
-            user.movies.push(movieX);
-            return user.save();
-        })
+        var agent = chai.request.agent(app)
+      return agent
+        .post('/auth/login')
+        .send({ username, password})
+        .then((err, res) => {
+          return User.findOne({})
+        .then(data => {
+          data.movies.push(movieX);
+          data.save((err,result) => {
+              // console.log('line 144: ', result);
+          });
+          expect(data.movies.length).to.equal(1);
+        });
+      })
+        User.findOne({})
         .then((user) => {
+          console.log('Line: 245: ', user);
           movieId = user.movies[0]._id;
           // console.log('Line 205: ', user);
-          return chai.request(app)
-            .delete(`/profile/mylist/${movieId.toString()}`)
-            .send({username: username, password: password})
-        })
-        .then((result) => {
-          expect(result).to.have.status(204);
-        });
+          return agent.delete(`/profile/movies/${movieId}`)
+            .then(function (res) {
+              expect(data.movies.length).to.equal(0);
+               expect(res).to.have.status(200);
+            });
+        }); 
     });
   }); 
 
+  describe('POST /signup', function() {
+    it('Should reject short usernames', function() {
+      var agent = chai.request.agent(app)
+      const username = 'user';
+      return agent
+        .post('/auth/signup')
+        .send({username, password})
+        .then(res => {
+          // console.log('Line 266: ', res.text);
+          expect(res.text).to.include('That username is not valid.');
+          expect(res).to.have.status(200);
+        });
+    });
+    
+    it('Should reject short passwords', function() {
+      var agent = chai.request.agent(app)
+      const password = 'passwor';
+      return agent
+        .post('/auth/signup')
+        .send({username, password})
+        .then(res => {
+          expect(res.text).to.include('That password is not valid');
+          expect(res).to.have.status(200);
+        });
+    });    
+  });
+
   describe('POST /login', function() {
     it('Should reject empty username field', function() {
-      return chai 
-        .request(app)
-        .post('/login')
-        .send({username: ''})
-        .then( res => {
-          expect(res).to.have.status(400);           
+      var agent = chai.request.agent(app)
+      const username = '';
+      return agent
+        .post('/auth/login')
+        .send({username, password})
+        .then(res => {
+          // console.log('Line 266: ', res.text);
+          expect(res.text).to.include('<form name="signup" method="post" action="/auth/signup">');
+          expect(res).to.have.status(200);
+        });
+    });
+
+
+    it('Should reject invalid usernames', function() {
+      var agent = chai.request.agent(app)
+      const username = 'user.';
+      return agent
+        .post('/auth/login')
+        .send({username, password})
+        .then(res => {
+          // console.log('Line 266: ', res.text);
+          expect(res.text).to.include('<form name="signup" method="post" action="/auth/signup">');
+          expect(res).to.have.status(200);
         });
     });
 
     it('Should reject empty password field', function() {
-      return chai 
-        .request(app)
-        .post('/login')
-        .send({password: ''})
-        .then( res => {
-          expect(res).to.have.status(400);           
+      var agent = chai.request.agent(app)
+      const password = '';
+      return agent
+        .post('/auth/login')
+        .send({username, password})
+        .then(res => {
+          expect(res.text).to.include('<form name="signup" method="post" action="/auth/signup">');
+          expect(res).to.have.status(200);
+        });
+    });
+
+    it('Should reject invalid passwords', function() {
+      var agent = chai.request.agent(app)
+      const password = 'passwor.';
+      return agent
+        .post('/auth/login')
+        .send({username, password})
+        .then(res => {
+          expect(res.text).to.include('<form name="signup" method="post" action="/auth/signup">');
+          expect(res).to.have.status(200);
         });
     });
   });
 
-  describe.only('POST /login', function() {
-    it('Should reject empty username field', function() {
-      return chai 
-        .request(app)
-        .post('/login')
-        .send({username: ''})
-        .then( res => {
-          expect(res).to.have.status(400);           
-        });
-    });
+  // At least two more tests... One for a minimum number of chars for username (3?) and another minimum for password (6?);
 
-    it('Should reject empty password field', function() {
-      return chai 
-        .request(app)
-        .post('/login')
-        .send({password: ''})
-        .then( res => {
-          expect(res).to.have.status(400);           
-        });
-    });
-  });
+
 });
 
 // router.post('/users', (req, res) => {
