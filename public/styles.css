@@ -1,3 +1,64 @@
+body {
+	margin: 0px;
+}
+
+header {
+	background-image: url('http://digm.drexel.edu/acelab/wp-content/uploads/2013/10/PosterCollage.jpg');
+	background-size: 100% 100%;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.intro {
+	display: flex;
+	flex-direction: column;
+	color: white;
+	text-align: center;
+	background: rgba(13, 71, 161, .8);
+}
+h1 {
+	font-family: 'Kanit', sans-serif;
+	font-size: 3em;
+	font-style: italic;
+}
+
+p {
+	font-family: 'Titillium Web', sans-serif;
+	font-size: 1.5em; 
+}
+
+.login {
+	background: #F44336;
+	width: 15%;
+	padding: 10px 5px;
+	margin-left: auto;
+	margin-right: auto;
+	font-weight: bold;
+	border-radius: 5px;
+}
+
+.login a {
+	color: white;
+	text-decoration: none;
+}
+
+.login:hover {
+	box-shadow: 10px 8px;
+	color: rgba(0, 0, 0, 0.5);
+	transition: 200ms;
+}
+
+.icon {
+	font-size: 3em;
+}
+
+.purpose-flex {
+	display: flex;
+	justify-content: space-around;
+}
+
 .movie-container {
 	display: flex;
 	justify-content: space-around;

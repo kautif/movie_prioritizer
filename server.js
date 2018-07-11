@@ -15,6 +15,8 @@ const passport = require('passport');
 const User = require('./models/user');
 const MovieController = require('./controllers/movieController');
 
+const flash = require('connect-flash');
+
 mongoose.Promise = global.Promise;
 
 const app = express();
@@ -34,6 +36,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 
 const { PORT, DATABASE_URL } = require('./config');
 
@@ -51,9 +54,9 @@ app.use('/profile', profileRoutes);
 // }
 let server; 
 
-function runServer() {
+function runServer(dbUrl) {
   return new Promise((resolve, reject) => {
-    mongoose.connect(DATABASE_URL, err => {
+    mongoose.connect(dbUrl, err => {
       if (err) {
         return reject(err);
       }
@@ -84,26 +87,51 @@ function closeServer() {
 }
 
 // Add a movie to list
-app.put('/profile/movies', urlencodedParser, (req, res) => {
+app.put('/profile/movies', (req, res) => {
 	// If not signed in, redirect to login. Create function for multiple places. 
-	User.findById((req.user._id), (err, user) => {
-		// console.log('server.js req.body Line 90: ', req.body.title)
-		if(User.find({"title": req.body.title, "rating": req.body.rating, "release": req.body.release})) {
-			return
-		} else {
-			user.movies.push(req.body);
-			user.save((err, d) => {
-				res.json();
-				// console.log(d);
-			});
+		let user = req.user;
+
+		if(!user) {
+			return res.sendStatus(400);
 		}
-		if (err) {
-			res.status(400).json(err);
+		// console.log(req.body);
+
+		const {title, rating, release, tmdbID} = req.body;
+
+		if (user.movies.some(element => element.tmdbID == tmdbID)) {
+			return res.sendStatus(400);
 		}
-	});
+
+		user.movies.push({title, rating, release, tmdbID});
+
+		user.save((err, d) => {
+			if (err) {
+				console.log(err);
+				return res.sendStatus(500);
+			}
+
+			res.sendStatus(200);
+			console.log(d);
+		});
+
+	// User.findById((req.user._id), (err, user) => {
+	// 	// console.log('server.js req.body Line 90: ', req.body.title)
+	// 	if(User.find({"title": req.body.title, "rating": req.body.rating, "release": req.body.release})) {
+	// 		return
+	// 	} else {
+	// 		user.movies.push(req.body);
+	// 		user.save((err, d) => {
+	// 			res.json();
+	// 			// console.log(d);
+	// 		});
+	// 	}
+	// 	if (err) {
+	// 		res.status(400).json(err);
+	// 	}
+	// });
 });
 
-app.put('/profile/mylist', urlencodedParser, (req, res) => {
+app.put('/profile/mylist', (req, res) => {
 
 	User.findById(req.user._id, (err, user) => {
 		// User.find({req.user.movies.title, req.user.movies.rating, req.user.movies.release})
@@ -138,7 +166,7 @@ app.put('/profile/mylist', urlencodedParser, (req, res) => {
 
 })
 // process.env.TEST_DATABASE_URL ? '5b05eb04f66010215024ac29' : req.user._id
-app.get('/profile/mylist', urlencodedParser, function(req, res){
+app.get('/profile/mylist', function(req, res){
 		User.findById(req.user._id, (err, user) => {
 		// console.log('req', req);
 		// console.log('req.user: ', req.user);
@@ -152,19 +180,35 @@ app.get('/profile/mylist', urlencodedParser, function(req, res){
 		// 	user: user
 		// });
 	
-		res.render('mylist', {
-			movies: user.movies.sort((a, b) => {
-				// console.log(res);
-				return a.position - b.position;
-			}),
-			user: user
-		});
+		if (req.accepts('text/html')) {
+			console.log('else');
+			res.render('mylist', {
+				movies: user.movies.sort((a, b) => {
+					// console.log(res);
+					return a.position - b.position;
+				}),
+				user: user
+			});
+		} else {
+			res.json(user.movies);
+		}
+
+	});
+});
+
+app.get('/profile/mylist/json', function(req, res) {
+	User.findById(req.user._id, (err, user) => {
+		if (err) {
+			res.status(400).json(err);
+		}
+
+		res.json(req.user.movies);
 	});
 });
 
 // Delete a movie from your list
 
-app.delete('/profile/mylist/:item', urlencodedParser, (req, res) => {
+app.delete('/profile/mylist/:item', (req, res) => {
 		// console.log('hi');
 		// First authenticate user prior to deletion. Only user should be able to delete own movies. 
 		User.findOneAndUpdate({"movies._id": req.params.item}, {$pull:{movies: {_id:req.params.item } }}, function(err, user){
