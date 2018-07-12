@@ -2,31 +2,43 @@
 <html>
 <head>
 	<title></title>
+	<link rel="stylesheet" type="text/css" href="/styles.css">
+	<link href="https://fonts.googleapis.com/css?family=Kanit:700i|Titillium+Web:300" rel="stylesheet">
 </head>
 <body>
-	<nav>	
-		<ul>
-			<li><a href="/auth/logout">Logout</a></li>
-			<li><a href="/auth/login">Login</a></li>
-			<li><a href="/">Home</a></li>
-		</ul>
-	</nav>
-	<header>	
-		<h1>Log in to start saving movies</h1>
-	</header>
-	<main>	
-		<h2>Sign Up</h2>
-		<form name="signup" method="post" action="/auth/signup">
-			<label>Username</label><input required type="text" name="username" id="new_user"><br>
-			<label>Password: </label><input required type="password" name="password" id="new_pw"><br>
-			<input type="submit" value="Sign Up">
-		</form>
+	<div class="login-container">
+		<nav>	
+			<a href="/">Movie Prioritizer</a>
+		</nav>
+		<div class="form-container">
+			<header class="login-head">	
+				<h1>Log in to start saving movies</h1>
+			</header>
+			<main class="forms">	
+				<div class="signup-form">
+					<h2>Sign Up</h2>
+					<% Object.keys(messages).forEach(msg => { %>
 
-		<form method="post" action="/auth/login">	
-			<label>Username</label><input required type="text" name="username" id="username"><br>
-			<label>Password: </label><input required type="password" name="password" id="password"><br>
-			<button type="submit">SUBMIT</button>
-		</form>
-	</main>
+						<p class=<%= msg %>><%= messages[msg] %></p>
+				<% }) %>
+					<form name="signup" method="post" action="/auth/signup">
+						<input placeholder="Create Username" type="text" name="username" id="new_user"><br>
+						<input placeholder="Create Password" required type="password" name="password" id="new_pw"><br>
+						<input class="form-btn" type="submit" value="SIGN UP">
+					</form>
+				</div>
+
+				<div class="login-form">
+					<h2>Login</h2>
+					<form method="post" action="/auth/login">	
+						<input placeholder="Enter Username" required type="text" name="username" id="username"><br>
+						<input placeholder="Enter Password" required type="password" name="password" id="password"><br>
+						<input class="form-btn" type="submit" value="SUBMIT">
+					</form>
+				</div>
+
+			</main>			
+		</div>
+	</div>
 </body>
 </html>
