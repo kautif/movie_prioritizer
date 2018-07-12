@@ -2,6 +2,19 @@ body {
 	margin: 0px;
 }
 
+.home {
+	text-decoration: none;
+	color: white;
+}
+
+.home p {
+	font-size: 1.5em;
+	font-family: 'Kanit', sans-serif;
+	margin-top: 0px;
+	margin-left: 20px;
+	display: inline;
+}
+
 .main-head {
 	background-image: url('http://digm.drexel.edu/acelab/wp-content/uploads/2013/10/PosterCollage.jpg');
 	background-size: 100% 100%;
