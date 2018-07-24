@@ -285,11 +285,17 @@ td {
 }
 
 @media (max-width: 320px) {
+	
+	nav {
+		text-align: center;
+	}
+
 	.intro {
 		display: inline;
 	}
 
-	.intro h1 {
+	.intro h1,
+	.login-head h1 {
 		font-size: 2em;
 	}
 
@@ -300,10 +306,20 @@ td {
 	.login {
 		width: 67%;
 	}
+
+	.home p {
+		font-size: 1em;
+	}
+
 }
 
 @media (max-width: 768px) {
 	.login {
 		width: 27%;
+	}
+
+	.forms {
+		flex-direction: column;
+		align-items: center;
 	}
 }
