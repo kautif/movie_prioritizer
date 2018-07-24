@@ -19,8 +19,9 @@ function movieSearch(){
 				query: queryStr
 			}), $.get('/profile/mylist/json'))
 				.done(function(searchResults, savedResults){
-					console.log('search results: ', searchResults, 'saved results: ', savedResults[0][0].tmdbID);
+					// console.log('search results: ', searchResults, 'saved results: ', savedResults[0][0].tmdbID);
 						let savedIds = [];
+						tmdbID = 0;
 					for (let i = 0; i < savedResults[0].length; i++) {
 						savedIds.push(savedResults[0][i].tmdbID);
 					}
@@ -95,11 +96,11 @@ function handleSearch(data, savedMovieIds){
 	for (let i = 0; i < data.results.length; i++) {
 		let resultName = data.results[i].title;
 		if (data.results[i].title.length > 15) {
-				resultName = data.results[i].title.substring(0, 15) + '...';
+				resultName = data.results[i].title.substring(0, 12) + '...';
 		}
 		
 		let imgPath = `https://image.tmdb.org/t/p/w200_and_h300_bestv2${data.results[i].poster_path}`;
-		let imgUnavailable = `https://lh5.googleusercontent.com/P4VjTC8EWiEiBBmhd9cSAwpVlOKS7ZEGhqBiwilh1OusZ5OIxNVlH8egH1lrXtiSySQBgxO-zTFmSf2sSC-L=w1366-h662`;
+		let imgUnavailable = `../img/img-unavailable.png`;
 		let finalImgPath;
 
 		if (imgPath === `https://image.tmdb.org/t/p/w200_and_h300_bestv2null`) {
