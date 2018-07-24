@@ -77,6 +77,9 @@ describe('Movie Repository', function () {
 
 // Can't get movies to save to database for some reason.
 
+// Con't *** Test for invalid chars in username and password but only for signup. 
+  // Test for accessing movies list while not logged in. Status should be a 200 since it will redirect to login. 
+
   describe('GET profile/mylist', function() {
     it('Should retrieve empty movie array for user', function () {
       var agent = chai.request.agent(app)

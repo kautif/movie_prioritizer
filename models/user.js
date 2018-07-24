@@ -6,7 +6,8 @@ const MovieSchema = new Schema({
 	title: String,
 	rating: Number,
 	release: String,
-	position: Number
+	position: Number,
+	tmdbID: Number
 });
 
 const UserSchema = new Schema({

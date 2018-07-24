@@ -4,6 +4,7 @@ const LocalStrategy = require('passport-local').Strategy;
 // const GoogleStrategy = require('passport-google-oauth20');
 const keys = require('./keys');
 const User = require('../models/user');
+// const flash = require('connect-flash');
 // const search = require('../public/js/search').movieList;
 
 // Puts mongodb id associated with specific user into cookie
@@ -66,7 +67,7 @@ passport.use('local-signup', new LocalStrategy(
 
             // check to see if theres already a user with that email
             if (user) {
-                return done(null, false, { message: 'That email is already taken.'});
+                return done(null, false, { message: 'That username is already taken.'});
             } else {
 
                 bcrypt.hash(password, saltRounds, function(err, hash) {

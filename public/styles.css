@@ -64,7 +64,7 @@ h1 {
 	font-style: italic;
 }
 
-p, h2, label, input {
+p, h2, label, input, nav {
 	font-family: 'Titillium Web', sans-serif;
 	font-size: 1.5em; 
 }
@@ -169,7 +169,7 @@ p, h2, label, input {
 
 
 .movies-body {
-	background-image: url('https://cdn4.img.sputniknews.com/images/105790/05/1057900520.jpg');
+	background-image: url('../img/movie_clerk.jpg');
 	background-size: cover;
 	/*height: 100vh;*/
 	background-repeat: no-repeat;
@@ -265,4 +265,45 @@ th {
 
 th, td {
 	text-align: center;
+}
+
+td {
+	background-color: #F3D785;
+	border: 1px solid black;
+}
+
+.list-body {
+	background-image: url('https://cdn4.img.sputniknews.com/images/105790/05/1057900520.jpg');
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+}
+
+.list-body h1,
+.list-body h3 {
+	text-align: center;
+}
+
+@media (max-width: 320px) {
+	.intro {
+		display: inline;
+	}
+
+	.intro h1 {
+		font-size: 2em;
+	}
+
+	.purpose-flex {
+		flex-direction: column;
+	}
+
+	.login {
+		width: 67%;
+	}
+}
+
+@media (max-width: 768px) {
+	.login {
+		width: 27%;
+	}
 }
