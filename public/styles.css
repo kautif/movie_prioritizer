@@ -307,12 +307,14 @@ td {
 		font-size: 1em;
 	}
 
-	.search-movies-container nav {
+	.search-movies-container nav,
+	.list-body nav {
 		text-align: none;
 		font-size: 1em;
 	}
 
-	.search-movies-container ul {
+	.search-movies-container ul,
+	.list-body ul {
 		padding-left: 0px;
 		align-items: center;
 	}
@@ -323,6 +325,12 @@ td {
 
 	.add-movie {
 		width: 70%;
+	}
+}
+
+@media (max-width: 380px) {
+	table {
+		font-size: 0.5em;
 	}
 }
 
@@ -341,6 +349,11 @@ td {
 		width: 30%;
 		padding: 10px;
 		border-radius: 5px;
+	}
+
+	.list-body h1,
+	.list-body h3 {
+		color: white;
 	}
 }
 
