@@ -185,10 +185,6 @@ p, h2, label, input, nav {
 	margin-right: auto;
 }
 
-.movie-results {
-	color: white;
-}
-
 .add-movie {
 	width: 21%;
 	display: flex;
@@ -311,9 +307,44 @@ td {
 		font-size: 1em;
 	}
 
+	.search-movies-container nav {
+		text-align: none;
+		font-size: 1em;
+	}
+
+	.search-movies-container ul {
+		padding-left: 0px;
+		align-items: center;
+	}
+
+	.movie-container {
+		width: 100%;
+	}
+
+	.add-movie {
+		width: 70%;
+	}
 }
 
 @media (max-width: 768px) {
+	#search-field {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	#search-field input {
+		margin-right: 0px;
+		margin-bottom: 10px;
+	}
+
+	#search-field button {
+		width: 30%;
+		padding: 10px;
+		border-radius: 5px;
+	}
+}
+
+@media (min-width: 321px) and (max-width: 768px) {
 	.login {
 		width: 27%;
 	}
@@ -321,5 +352,9 @@ td {
 	.forms {
 		flex-direction: column;
 		align-items: center;
+	}
+
+	.add-movie {
+		width: 34%;
 	}
 }
