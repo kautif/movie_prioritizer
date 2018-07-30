@@ -12,6 +12,12 @@ router.post('/login', passport.authenticate('local-login', { successRedirect: '/
                                    failureRedirect: '/auth/login',
                                    failureFlash: true }));
 
+router.get('/signup', (req, res) =>{
+	// Corresponds with login.ejs file which has not been created yet.
+	// ejs file needs to be in 'views' folder which should be located at root of this project
+	res.render('signup', {messages: req.flash()});
+});
+
 router.get('/login', (req, res) =>{
 	// Corresponds with login.ejs file which has not been created yet.
 	// ejs file needs to be in 'views' folder which should be located at root of this project

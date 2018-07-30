@@ -92,8 +92,11 @@ function handleSearch(data, savedMovieIds){
 		$('.movie-container').html('');
 	$.getJSON('/profile/mylist/json', console.log);
 // List of results
-	// console.log(data.results);
-	for (let i = 0; i < data.results.length; i++) {
+	console.log('How many movies? ', data.results.length);
+	if (data.results.length === 0) {
+		$('.movie-container').html(`<p class="sorry"><strong>Sorry. No results were found. Please try another search.</strong><p>`)
+	} else {
+		for (let i = 0; i < data.results.length; i++) {
 		let resultName = data.results[i].title;
 		if (data.results[i].title.length > 15) {
 				resultName = data.results[i].title.substring(0, 12) + '...';
@@ -111,7 +114,7 @@ function handleSearch(data, savedMovieIds){
 
 		$('.movie-container')
 		.append(`<form method="post" class="add-movie" id="${i}"> 
-			<p class="movie-results">${resultName}</p> 
+			<p class="movie-results"><strong>${resultName}</strong></p> 
 			<img movie-id="${i}" src="${finalImgPath}"> 
 			${savedMovieIds.includes(data.results[i].id) ? '<button disabled>Saved</button>' : '<button type="submit">Add to List</button>'} 
 			</form>`);
@@ -124,7 +127,7 @@ function handleSearch(data, savedMovieIds){
 			$('.movie-container').append(`
 				<div class="movie-result">
 				<span class="close">&times;</span>
-					<h1>${data.results[movieID].title}</h1>
+					<h1><strong>${data.results[movieID].title}</strong></h1>
 					<div class="ratings">
 						<h2>Ratings</h2>
 						<p>${data.results[movieID].vote_average * 10}%</p>
@@ -138,7 +141,7 @@ function handleSearch(data, savedMovieIds){
 				$('.movie-result').remove();
 			});
 		});
-
+	}
 }
 
 $('.delete').click(function(e){

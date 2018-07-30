@@ -15,19 +15,18 @@
 				<h1>Log in to start saving movies</h1>
 			</header>
 			<main class="forms">	
-				<div class="login-form">
-					<h2>Login</h2>
+				<div class="signup-form">
+					<h2>Sign Up</h2>
 					<% Object.keys(messages).forEach(msg => { %>
 
 						<p class=<%= msg %>><%= messages[msg] %></p>
 				<% }) %>
-					<form method="post" action="/auth/login">	
-						<input placeholder="Enter Username" required type="text" name="username" id="username"><br>
-						<input placeholder="Enter Password" required type="password" name="password" id="password"><br>
-						<input class="form-btn" type="submit" value="SUBMIT">
+					<form name="signup" method="post" action="/auth/signup">
+						<input placeholder="Create Username" type="text" name="username" id="new_user"><br>
+						<input placeholder="Create Password" required type="password" name="password" id="new_pw"><br>
+						<input class="form-btn" type="submit" value="SIGN UP">
 					</form>
 				</div>
-
 			</main>			
 		</div>
 	</div>

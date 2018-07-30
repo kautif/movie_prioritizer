@@ -52,11 +52,11 @@ passport.use('local-signup', new LocalStrategy(
         // asynchronous
         // User.findOne wont fire unless data is sent back
         if(!validUsername(username)) {
-            return done(null, false, {message: 'That username is not valid. Must be at least 5 characters. Can contain only letters or numbers.'})
+            return done(null, false, {message: 'Username must be at least 5 characters and letters or numbers only.'})
         }
 
         if(!validPassword(password)) {
-            return done(null, false, { message: 'That password is not valid. Must be at least 8 characters. Can contain only letters or numbers.'})
+            return done(null, false, { message: 'Password must be at least 8 characters and letters or numbers only.'})
         }
         // find a user whose email is the same as the forms email
         // we are checking to see if the user trying to login already exists

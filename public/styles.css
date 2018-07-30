@@ -43,7 +43,7 @@ nav li a:hover {
 }
 
 .main-head {
-	background-image: url('http://digm.drexel.edu/acelab/wp-content/uploads/2013/10/PosterCollage.jpg');
+	background-image: url('./img/cinema.jpg');
 	background-size: 100% 100%;
 	height: 100vh;
 	display: flex;
@@ -64,9 +64,13 @@ h1 {
 	font-style: italic;
 }
 
-p, h2, label, input, nav {
+p, h2, label, input, nav, span {
 	font-family: 'Titillium Web', sans-serif;
 	font-size: 1.5em; 
+}
+
+.users {
+	display: flex;
 }
 
 .login {
@@ -196,6 +200,11 @@ p, h2, label, input, nav {
 	padding: 10px;
 	margin-top: 15px;
 	font-size: 1.5em;
+}
+
+.sorry {
+	margin-left: auto;
+	margin-right: auto;
 }
 
 /*table {
