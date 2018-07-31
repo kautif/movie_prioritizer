@@ -17,6 +17,9 @@
 <p>bcrypt</p>
 <p>Passport</p>
 <p>Mocha & Chai</p>
+<p>mLab</p>
+<p>TravisCL</p>
+<p>Heroku</p>
 
 <h3>Home Page</h3>
 <img src="https://lh3.googleusercontent.com/-bQb1ac8tVhY/W1-leZtgRaI/AAAAAAAAHaw/JCTrcr5e8CwSgQJWwhGhMGdhZdhkos2ZQCL0BGAYYCw/h768/2018-07-30.png">
