@@ -1,19 +1,24 @@
 <h1>Movie Prioritizer</h1>
-<a href="#">Live App</a>
+<a target="_blank" href="https://radiant-wave-64843.herokuapp.com/">Live App</a>
 <h2>API Documentation (?)</h2>
 
 <h2>Summary</h2>
 <p>The purpose of this web application is to make it easy for you to find movies that have already come out or are expected to and save them on a list. Also, you can drag and drop movie titles to manipulate their order, so that you can keep track of which ones you want to see and when.</p>
 
 <h2>Technologies</h2>
+<h3>Front End</h3>
 <p>HTML & CSS</p>
 <p>jQuery</p>
+
+<h3>Back End</h3>
 <p>Node.js</p>
 <p>Express</p>
-<p>Mocha & Chai</p>
-<p>EJS</p>
-<p>Passport</p>
 <p>MongoDB</p>
+<p>Mongoose</p>
+<p>EJS</p>
+<p>bcrypt</p>
+<p>Passport</p>
+<p>Mocha & Chai</p>
 
 <h3>Home Page</h3>
 <img src="https://lh3.googleusercontent.com/-bQb1ac8tVhY/W1-leZtgRaI/AAAAAAAAHaw/JCTrcr5e8CwSgQJWwhGhMGdhZdhkos2ZQCL0BGAYYCw/h768/2018-07-30.png">
