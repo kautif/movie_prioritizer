@@ -1,7 +1,5 @@
 <h1>Movie Prioritizer</h1>
 <a target="_blank" href="https://radiant-wave-64843.herokuapp.com/">Live App</a>
-<h2>API Documentation (?)</h2>
-
 <h2>Summary</h2>
 <p>The purpose of this web application is to make it easy for you to find movies that have already come out or are expected to and save them on a list. Also, you can drag and drop movie titles to manipulate their order, so that you can keep track of which ones you want to see and when.</p>
 
